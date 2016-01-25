@@ -302,6 +302,7 @@ class Resources(object):
             match = re.compile(excludepattern).match
         join = os.path.join
         add = self.add
+        print(path)
         abspath = os.path.abspath(path)
         if not os.path.exists(abspath):
             raise ValueError("invalid path '%s'" % path)
