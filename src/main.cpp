@@ -5,6 +5,8 @@
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 840;
 
+const int TILE_SIZE = 14;
+
 void assertptr(void *val, std::string ErrorText) {
     if (val == nullptr) {
         std::cout << ErrorText << SDL_GetError() << std::endl;
@@ -13,38 +15,81 @@ void assertptr(void *val, std::string ErrorText) {
     }
 }
 
+void logSDLError(std::ostream &os, const std::string &msg){
+	os << msg << " error: " << SDL_GetError() << std::endl;
+}
+
+SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
+
+	SDL_Texture *texture = nullptr;
+
+	SDL_Surface *loadedImage = SDL_LoadBMP(file.c_str());
+
+	if (loadedImage != nullptr){
+		texture = SDL_CreateTextureFromSurface(ren, loadedImage);
+        
+		SDL_FreeSurface(loadedImage);
+
+		if (texture == nullptr){
+			logSDLError(std::cout, "CreateTextureFromSurface");
+		}
+	}
+	else {
+		logSDLError(std::cout, "LoadBMP");
+	}
+	return texture;
+}
+
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y){
+	SDL_Rect destination;
+	destination.x = x;
+	destination.y = y;
+	SDL_QueryTexture(tex, NULL, NULL, &destination.w, &destination.h);
+	SDL_RenderCopy(ren, tex, NULL, &destination);
+}
+
+void renderSprite(SDL_Texture *tex, SDL_Renderer *ren, int srcx, int srcy, int x, int y) {
+
+    SDL_Rect source;
+    source.x = srcx;
+    source.y = srcy;
+    source.h = TILE_SIZE;
+    source.w = TILE_SIZE;
+
+	SDL_Rect destination;
+	destination.x = x;
+	destination.y = y;
+
+	SDL_QueryTexture(tex, NULL, NULL, &destination.w, &destination.h);
+	SDL_RenderCopy(ren, tex, &source, &destination);
+}
+
 int main(int, char**){
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
-    SDL_Window *win = SDL_CreateWindow("Perun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 840, 840, 0);
-    assertptr(win, "SDL_CreateWindow Error: ");
+    SDL_Window *window = SDL_CreateWindow("Perun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 840, 840, 0);
+    assertptr(window, "SDL_CreateWindow Error: ");
 
-    SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    assertptr(ren, "SDL_CreateRenderer Error: ");
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    assertptr(renderer, "SDL_CreateRenderer Error: ");
 
-    //std::string imagePath = getResourcePath("res") + "Sprites.png";
-    SDL_Surface *bmp = SDL_LoadBMP("res/Sprites.bmp");
-    assertptr(bmp, "SDL_LoadBMP Error: ");
-
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
-    SDL_FreeSurface(bmp);
-    assertptr(tex, "SDL_CreateTextureFromSurface Error: ");
+    SDL_Texture *background = loadTexture("res/RawTemplate.bmp", renderer);
 
     //A sleepy rendering loop, wait for 3 seconds and render and present the screen each time
     for (int i = 0; i < 3; ++i){
     	//First clear the renderer
-    	SDL_RenderClear(ren);
+    	SDL_RenderClear(renderer);
     	//Draw the texture
-    	SDL_RenderCopy(ren, tex, NULL, NULL);
+    	renderTexture(background, renderer, 0, 0);
     	//Update the screen
-    	SDL_RenderPresent(ren);
+    	SDL_RenderPresent(renderer);
     	//Take a quick break after all that hard work
     	SDL_Delay(1000);
     }
 
-    cleanup(ren, win, tex);
+    cleanup(renderer, window, background);
     SDL_Quit();
 	return 0;
 }
