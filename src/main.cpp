@@ -27,7 +27,7 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 
 	if (loadedImage != nullptr){
 		texture = SDL_CreateTextureFromSurface(ren, loadedImage);
-        
+
 		SDL_FreeSurface(loadedImage);
 
 		if (texture == nullptr){
@@ -59,9 +59,15 @@ void renderSprite(SDL_Texture *tex, SDL_Renderer *ren, int srcx, int srcy, int x
 	SDL_Rect destination;
 	destination.x = x;
 	destination.y = y;
+    destination.h = TILE_SIZE;
+    destination.w = TILE_SIZE;
 
-	SDL_QueryTexture(tex, NULL, NULL, &destination.w, &destination.h);
 	SDL_RenderCopy(ren, tex, &source, &destination);
+}
+
+//Write out a message to the ingame user in the text output
+void write_player_message() {
+
 }
 
 int main(int, char**){
@@ -76,13 +82,15 @@ int main(int, char**){
     assertptr(renderer, "SDL_CreateRenderer Error: ");
 
     SDL_Texture *background = loadTexture("res/RawTemplate.bmp", renderer);
+    SDL_Texture *spritesheet = loadTexture("res/Sprites.bmp");
 
-    //A sleepy rendering loop, wait for 3 seconds and render and present the screen each time
+    //Main game loop
     for (int i = 0; i < 3; ++i){
     	//First clear the renderer
     	SDL_RenderClear(renderer);
     	//Draw the texture
     	renderTexture(background, renderer, 0, 0);
+        renderSprite(background, renderer, 0, 0, 14, 14);
     	//Update the screen
     	SDL_RenderPresent(renderer);
     	//Take a quick break after all that hard work
