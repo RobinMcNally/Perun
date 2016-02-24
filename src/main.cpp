@@ -1,16 +1,19 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <string>
-#include "cleanup.h"
+#include <unistd.h>
+#include "../include/cleanup.h"
+#include "../include/world.h"
 
 using namespace std;
 
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 840;
 
-const int TILE_SIZE = 14;
+extern const int WORLD_WIDTH;
+extern const int WORLD_HEIGHT;
 
-vector<string> outputLog;
+const int TILE_SIZE = 14;
 
 class Player {
     public:
@@ -81,7 +84,13 @@ void write_player_message(string message) {
 
 }
 
+void renderView(){
+
+}
+
 int main(int, char**){
+
+    usleep(4000);
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return 1;
@@ -101,6 +110,18 @@ int main(int, char**){
     player.ylocation = 14;
     int quit = 0;
     //Main game loop
+
+    cout << "hi\n";
+    world gameworld;
+    cout << "worked\n";
+    gameworld.generate_world();
+
+    for (size_t y = 0; y < WORLD_WIDTH; y++) {
+        for (size_t x = 0; x < WORLD_HEIGHT; x++) {
+            cout << gameworld.worldmap[x][y];
+        }
+        cout << "\n";
+    }
 
     while(!quit) {
     	//First clear the renderer

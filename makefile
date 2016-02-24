@@ -9,14 +9,19 @@ CXXFLAGS = -Wall -c -std=c++11 $(SDL_INCLUDE)
 LDFLAGS = $(SDL_LIB)
 EXE = Perun.out
 VPATH = src
+SOURCES = world.o
 
-all: $(EXE)
+all: $(EXE) $(SOURCES)
 
-$(EXE): main.o
-	$(CXX) $< $(LDFLAGS) -o $@
+$(EXE): main.o world.o
+	$(CXX) $< $(LDFLAGS) -o $@ $(SOURCES)
+
+world.o: world.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 main.o: main.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
+
 
 clean:
 	rm *.o && rm $(EXE)
