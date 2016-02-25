@@ -98,12 +98,12 @@ void write_player_message(string message) {
 }
 
 //Basic euclidean distance
-int distance(int y1, int x1, int y2, int x2) {
+double distance(int y1, int x1, int y2, int x2) {
     return sqrt(abs(pow((y2 - y1), 2) + pow(x2 - x1, 2)));
 }
 
 //Thanks to roguebasin for this simple FOV algorithm
-void FOV(Player player, world world){
+void fov(Player player, world world){
     if (player.hasmoved) {
         for (int i = 0; i < WORLD_HEIGHT; i++) {
             for (int j = 0; j < WORLD_WIDTH; j++) {
@@ -115,11 +115,16 @@ void FOV(Player player, world world){
     }
 }
 
-vector2 GetVector (vector2 vect1, vector2 vect2) {
+vector2 get_vector(vector2 vect1, vector2 vect2) {
     vector2 delta;
     delta.x = abs(vect2.x - vect1.x);
     delta.y = abs(vect2.y - vect1.y);
-
+    double dist = distance(vect1.y, vect1.x, vect2.y, vect2.x);
+    if (dist == 0.0) {
+        return vect1;
+    } else {
+        vector2 direction = delta/distance;
+    }
 }
 
 int main(int, char**){
