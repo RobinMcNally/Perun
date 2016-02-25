@@ -9,17 +9,30 @@ using namespace std;
 
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 840;
+//                           {x, y}
+const int SCREEN_START[2] = {12, 1};
+const int SCREEN_END[2] = {58, 34};
+const int SCREEN_CENTER[2] = {(SCREEN_END[0] - SCREEN_START[0]) / 2, (SCREEN_END[1] - SCREEN_START[1]) / 2}
+const int FOV_RADIUS = 5;
 
 extern const int WORLD_WIDTH;
 extern const int WORLD_HEIGHT;
 
+
 const int TILE_SIZE = 14;
 
 class Player {
-    public:
+public:
+    bool hasmoved;
     int xlocation;
     int ylocation;
 };
+
+class vector2 {
+public:
+    double x;
+    double y;
+}
 
 void assertptr(void *val, std::string ErrorText) {
     if (val == nullptr) {
@@ -84,7 +97,28 @@ void write_player_message(string message) {
 
 }
 
-void renderView(){
+//Basic euclidean distance
+int distance(int y1, int x1, int y2, int x2) {
+    return sqrt(abs(pow((y2 - y1), 2) + pow(x2 - x1, 2)));
+}
+
+//Thanks to roguebasin for this simple FOV algorithm
+void FOV(Player player, world world){
+    if (player.hasmoved) {
+        for (int i = 0; i < WORLD_HEIGHT; i++) {
+            for (int j = 0; j < WORLD_WIDTH; j++) {
+                if (distance(i, j, player.ylocation, player.xlocation) <= FOV_RADIUS) {
+
+                }
+            }
+        }
+    }
+}
+
+vector2 GetVector (vector2 vect1, vector2 vect2) {
+    vector2 delta;
+    delta.x = abs(vect2.x - vect1.x);
+    delta.y = abs(vect2.y - vect1.y);
 
 }
 
@@ -108,6 +142,7 @@ int main(int, char**){
     Player player;
     player.xlocation = 14;
     player.ylocation = 14;
+    player.hasmoved = false;
     int quit = 0;
     //Main game loop
 
